@@ -40,6 +40,8 @@ while fajci:
     for bomby in h1.bomby:
         bomby.fajci()
         bomby.draw(screen)
+        if bomby.bum:
+            bomby.vybuch(mapa.mapa)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
