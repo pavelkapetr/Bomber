@@ -46,6 +46,8 @@ while fajci:
 
         bomby.fajci()
         bomby.draw()
+        for x, y in bomby.odbouchnuto:
+            screen.blit(exploze, (x, y))
 
     h1.pohyb()
     h1.x, h1.y = h1.souradnice_policka(velikost_pole, novy_x, novy_y)

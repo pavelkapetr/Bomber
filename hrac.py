@@ -95,6 +95,11 @@ class Bomba(Player):
         self.dosah = dosah
         self.zpozdeni = 1000
         self.pocatek = pygame.time.get_ticks()
+        self.prava_pokracuje = True
+        self.leva_pokracuje = True
+        self.hore_pokracuje = True
+        self.dolu_pokracuje = True
+        self.odbouchnuto = []
 
     def fajci(self):
         nyni = pygame.time.get_ticks()
@@ -109,44 +114,55 @@ class Bomba(Player):
             self.zacatek_vybuchu = pygame.time.get_ticks()
 
             # expanze výbuchu doprava
-            for dx in range(1, self.dosah + 1):
-                i = self.policko_x + dx
-                if i >= len(mapa) or mapa[i][self.policko_y] == 0:
-                    break
-                if mapa[i][self.policko_y] == 2:
-                    mapa[i][self.policko_y] = 1
-                    break
-                self.screen.blit(exploze,((i * 128 + 384), (self.policko_y * 128 + (-6))))
+            if self.prava_pokracuje:
+                for dx in range(self.dosah + 1):
+                    x_prava = self.policko_x + dx
+                    if x_prava >= len(mapa) or mapa[x_prava][self.policko_y] == 0:
+                        break
+                    if mapa[x_prava][self.policko_y] == 2:
+                        mapa[x_prava][self.policko_y] = 1
+                        self.odbouchnuto.append((x_prava * 128 + 384, self.policko_y * 128 + (-6)))
+                        self.prava_pokracuje = False
+                        break
+                    self.odbouchnuto.append((x_prava * 128 + 384, self.policko_y * 128 + (-6)))
 
             #expanze výbuchu doleva
-            for dx in range(-1, -self.dosah - 1, -1):
-                i = self.policko_x + dx
-                if i < 0 or mapa[i][self.policko_y] == 0:
-                    break
-                if mapa[i][self.policko_y] == 2:
-                    mapa[i][self.policko_y] = 1
-                    break
-                self.screen.blit(exploze, ((i * 128 + 384), (self.policko_y * 128 + (-6))))
+            if self.leva_pokracuje:
+                for dx in range(-1, -self.dosah - 1, -1):
+                    x_leva = self.policko_x + dx
+                    if x_leva < 0 or mapa[x_leva][self.policko_y] == 0:
+                        break
+                    if mapa[x_leva][self.policko_y] == 2:
+                        mapa[x_leva][self.policko_y] = 1
+                        self.odbouchnuto.append((x_leva * 128 + 384, self.policko_y * 128 + (-6)))
+                        self.leva_pokracuje = False
+                        break
+                    self.odbouchnuto.append((x_leva * 128 + 384, self.policko_y * 128 + (-6)))
 
             #expanze výbuchu dolů
-            for dy in range(1, self.dosah + 1):
-                j = self.policko_y + dy
-                if j >= len(mapa[0]) or mapa[self.policko_x][j] == 0:
-                    break
-                if mapa[self.policko_x][j] == 2:
-                    mapa[self.policko_x][j] = 1
-                    break
-                self.screen.blit(exploze, ((self.policko_x * 128 + 384), (j * 128 + (-6))))
+            if self.dolu_pokracuje:
+                for dy in range(1, self.dosah + 1):
+                    y_dolu = self.policko_y + dy
+                    if y_dolu >= len(mapa[0]) or mapa[self.policko_x][y_dolu] == 0:
+                        break
+                    if mapa[self.policko_x][y_dolu] == 2:
+                        mapa[self.policko_x][y_dolu] = 1
+                        self.odbouchnuto.append((self.policko_x * 128 + 384, y_dolu * 128 + (-6)))
+                        self.dolu_pokracuje = False
+                        break
+                    self.odbouchnuto.append((self.policko_x * 128 + 384, y_dolu * 128 + (-6)))
 
             #expanze výbuchu nahorů
-            for dy in range(-1, -self.dosah - 1, -1):
-                j = self.policko_y + dy
-                if j < 0 or mapa[self.policko_x][j] == 0:
-                    break
-                if mapa[self.policko_x][j] == 2:
-                    mapa[self.policko_x][j] = 1
-                    break
-                self.screen.blit(exploze, ((self.policko_x * 128 + 384), (j * 128 + (-6))))
+            if self.hore_pokracuje:
+                for dy in range(-1, -self.dosah - 1, -1):
+                    y_hore = self.policko_y + dy
+                    if y_hore < 0 or mapa[self.policko_x][y_hore] == 0:
+                        break
+                    if mapa[self.policko_x][y_hore] == 2:
+                        mapa[self.policko_x][y_hore] = 1
+                        self.odbouchnuto.append((self.policko_x * 128 + 384, y_hore * 128 + (-6)))
+                        break
+                    self.odbouchnuto.append((self.policko_x * 128 + 384, y_hore * 128 + (-6)))
 
     def draw(self):
         if self.obr == bomba1_obr or self.obr == bomba2_obr:
