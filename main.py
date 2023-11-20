@@ -11,12 +11,12 @@ pygame.display.set_caption("Bomber")
 sirka = 1920
 vyska = 1140
 screen = pygame.display.set_mode((sirka, vyska))
-velikost_pole = 128
 
+velikost_pole = 128
 novy_x = (sirka - len(mapa.mapa[0]) * velikost_pole) // 2
 novy_y = (vyska - len(mapa.mapa) * velikost_pole) // 2
 
-h1 = Player(mapa.mapa)
+h1 = Player(mapa.mapa, screen)
 
 fajci = True
 while fajci:
@@ -43,16 +43,9 @@ while fajci:
     for bomby in h1.bomby:
         if bomby.bum:
             bomby.vybuch(mapa.mapa)
-            souradky_exploze = bomby.pozice_exploze(velikost_pole, novy_x, novy_y)
 
-            # Draw explosion images
-            for x, y, cas_exploze in souradky_exploze:
-                screen.blit(exploze, (x, y))
-
-
-        # Call the remaining functions for bombs
         bomby.fajci()
-        bomby.draw(screen)
+        bomby.draw()
 
     h1.pohyb()
     h1.x, h1.y = h1.souradnice_policka(velikost_pole, novy_x, novy_y)
