@@ -38,6 +38,8 @@ while fajci:
                 screen.blit(mapa.trava_obr, (x, y))
             elif mapa.mapa[rada][sloupec] == 2:
                 screen.blit(mapa.box_obr, (x, y))
+            elif mapa.mapa[rada][sloupec] == 3:
+                screen.blit(mapa.trava_vybuch_obr, (x, y))
 
     # projde všechny bomby a upraví jejich stav
     for bomby in h1.bomby:
