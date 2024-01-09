@@ -34,26 +34,24 @@ while fajci:
             y = sloupec * velikost_pole + novy_y
             if mapa.mapa[rada][sloupec] == 0:
                 screen.blit(mapa.zed_obr, (x, y))
-            elif mapa.mapa[rada][sloupec] == 1:
+            if mapa.mapa[rada][sloupec] == 1:
                 screen.blit(mapa.trava_obr, (x, y))
-            elif mapa.mapa[rada][sloupec] == 2:
+            if mapa.mapa[rada][sloupec] == 2:
                 screen.blit(mapa.box_obr, (x, y))
-            elif mapa.mapa[rada][sloupec] == 3:
+            if mapa.mapa[rada][sloupec] == 3:
                 screen.blit(mapa.trava_vybuch_obr, (x, y))
 
     # projde všechny bomby a upraví jejich stav
     for bomby in h1.bomby:
         if bomby.bum:
             bomby.vybuch(mapa.mapa)
-
+        #else:
+            #bomby.ende(mapa.mapa)
         bomby.fajci()
         bomby.draw()
-        for x, y in bomby.odbouchnuto:
-            screen.blit(exploze, (x, y))
 
     h1.pohyb()
     h1.x, h1.y = h1.souradnice_policka(velikost_pole, novy_x, novy_y)
-    h1.kontrola_bomb()
     screen.blit(h1.obr, (h1.x, h1.y))
 
     pygame.display.flip()

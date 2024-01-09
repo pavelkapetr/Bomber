@@ -20,10 +20,11 @@ class Player:
         self.cooldown = 100
         self.pocet_bomb = 1
         self.bomby = []
-        self.dosah = 1
+        self.dosah = 2
         self.bumbumbox = []
         self.mapa = mapa
         self.screen = screen
+        self.polozeno = 0
 
     def souradnice_policka(self, velikost_policka, novy_x, novy_y):
         x = self.policko_x * velikost_policka + novy_x
@@ -51,6 +52,7 @@ class Player:
             elif klavesa[pygame.K_SPACE] and self.pocet_bomb > 0:
                 self.vytvor_bombu()
                 self.pocet_bomb -= 1
+                self.polozeno = pygame.time.get_ticks()
 
             self.posledne = nyni
 
@@ -59,29 +61,6 @@ class Player:
         bomba_y = self.y
         bomba = Bomba(bomba_x, bomba_y, self.dosah, self.policko_x, self.policko_y, self.mapa, self.screen)
         self.bomby.append(bomba)
-
-    def kontrola_bomb(self):
-        nyni = pygame.time.get_ticks()
-        k_odstraneni = []
-
-        for bomba in self.bomby:
-            if bomba.bum:
-                if nyni - bomba.pocatek >= 3 * bomba.zpozdeni:
-                    k_odstraneni.append(bomba)
-                    self.pocet_bomb += 1
-                    for i in range(bomba.policko_x - bomba.dosah, bomba.policko_x + bomba.dosah + 1):
-                        for j in range(bomba.policko_y - bomba.dosah, bomba.policko_y + bomba.dosah + 1):
-                            if (
-                                    0 <= i < len(self.mapa) and 0 <= j < len(self.mapa[0])
-                                    and (i != bomba.policko_x or j != bomba.policko_y)
-                            ):
-                                if self.mapa[i][j] == 2 or self.mapa[i][j] == 1:
-                                    self.bumbumbox.append((i, j, nyni))
-            else:
-                bomba.fajci()
-        for bomba in k_odstraneni:
-            self.bomby.remove(bomba)
-
 
 class Bomba(Player):
     def __init__(self, x, y, dosah, policko_x, policko_y, mapa, screen):
@@ -100,6 +79,9 @@ class Bomba(Player):
         self.hore_pokracuje = True
         self.dolu_pokracuje = True
         self.odbouchnuto = []
+        self.vybuchujici_policko = []
+        self.q = 0
+        self.zacatek_vybuchu = 0
 
     def fajci(self):
         nyni = pygame.time.get_ticks()
@@ -108,61 +90,84 @@ class Bomba(Player):
         if nyni - self.pocatek >= 2 * self.zpozdeni:
             self.obr = exploze
             self.bum = True
+        if nyni - self.pocatek >= 3 * self.zpozdeni:
+
+
+    #asdef ende(selfself, mapa):
+
 
     def vybuch(self, mapa):
-        if self.bum:
+        if self.q == 0:
             self.zacatek_vybuchu = pygame.time.get_ticks()
+            self.q += 1
+        # expanze výbuchu doprava
+        if self.prava_pokracuje:
+            for dx in range(self.dosah + 1):
+                x_prava = self.policko_x + dx
+                if x_prava >= len(mapa) or mapa[x_prava][self.policko_y] == 0:
+                    self.prava_pokracuje = False
+                    break
+                if mapa[x_prava][self.policko_y] == 2:
+                    mapa[x_prava][self.policko_y] = 3
+                    self.vybuchujici_policko.append([x_prava, self.policko_y])
+                    self.prava_pokracuje = False
+                    break
+                if mapa[x_prava][self.policko_y] == 1:
+                    mapa[x_prava][self.policko_y] = 3
+                    self.vybuchujici_policko.append([x_prava, self.policko_y])
 
-            # expanze výbuchu doprava
-            if self.prava_pokracuje:
-                for dx in range(self.dosah + 1):
-                    x_prava = self.policko_x + dx
-                    if x_prava >= len(mapa) or mapa[x_prava][self.policko_y] == 0:
-                        break
-                    if mapa[x_prava][self.policko_y] == 2:
-                        mapa[x_prava][self.policko_y] = 1
-                        self.odbouchnuto.append((x_prava * 128 + 384, self.policko_y * 128 + (-6)))
-                        self.prava_pokracuje = False
-                        break
-                    self.odbouchnuto.append((x_prava * 128 + 384, self.policko_y * 128 + (-6)))
+        # expanze výbuchu doleva
+        if self.leva_pokracuje:
+            for dx in range(-1, -self.dosah - 1, -1):
+                x_leva = self.policko_x + dx
+                if x_leva < 0 or mapa[x_leva][self.policko_y] == 0:
+                    self.leva_pokracuje = False
+                    break
+                if mapa[x_leva][self.policko_y] == 2:
+                    mapa[x_leva][self.policko_y] = 3
+                    self.vybuchujici_policko.append(([x_leva, self.policko_y]))
+                    self.leva_pokracuje = False
+                    break
+                if mapa[x_leva][self.policko_y] == 1:
+                    mapa[x_leva][self.policko_y] = 3
+                    self.vybuchujici_policko.append(([x_leva, self.policko_y]))
 
-            #expanze výbuchu doleva
-            if self.leva_pokracuje:
-                for dx in range(-1, -self.dosah - 1, -1):
-                    x_leva = self.policko_x + dx
-                    if x_leva < 0 or mapa[x_leva][self.policko_y] == 0:
-                        break
-                    if mapa[x_leva][self.policko_y] == 2:
-                        mapa[x_leva][self.policko_y] = 1
-                        self.odbouchnuto.append((x_leva * 128 + 384, self.policko_y * 128 + (-6)))
-                        self.leva_pokracuje = False
-                        break
-                    self.odbouchnuto.append((x_leva * 128 + 384, self.policko_y * 128 + (-6)))
+        # expanze výbuchu dolů
+        if self.dolu_pokracuje:
+            for dy in range(1, self.dosah + 1):
+                y_dolu = self.policko_y + dy
+                if y_dolu >= len(mapa[0]) or mapa[self.policko_x][y_dolu] == 0:
+                    break
+                if mapa[self.policko_x][y_dolu] == 2:
+                    mapa[self.policko_x][y_dolu] = 3
+                    self.vybuchujici_policko.append([self.policko_x, y_dolu])
+                    self.dolu_pokracuje = False
+                    break
+                if mapa[self.policko_x][y_dolu] == 1:
+                    mapa[self.policko_x][y_dolu] = 3
+                    self.vybuchujici_policko.append([self.policko_x, y_dolu])
 
-            #expanze výbuchu dolů
-            if self.dolu_pokracuje:
-                for dy in range(1, self.dosah + 1):
-                    y_dolu = self.policko_y + dy
-                    if y_dolu >= len(mapa[0]) or mapa[self.policko_x][y_dolu] == 0:
-                        break
-                    if mapa[self.policko_x][y_dolu] == 2:
-                        mapa[self.policko_x][y_dolu] = 1
-                        self.odbouchnuto.append((self.policko_x * 128 + 384, y_dolu * 128 + (-6)))
-                        self.dolu_pokracuje = False
-                        break
-                    self.odbouchnuto.append((self.policko_x * 128 + 384, y_dolu * 128 + (-6)))
+        # expanze výbuchu nahorů
+        if self.hore_pokracuje:
+            for dy in range(-1, -self.dosah - 1, -1):
+                y_hore = self.policko_y + dy
+                if y_hore < 0 or mapa[self.policko_x][y_hore] == 0:
+                    break
+                if mapa[self.policko_x][y_hore] == 2:
+                    mapa[self.policko_x][y_hore] = 3
+                    self.vybuchujici_policko.append([self.policko_x, y_hore])
+                    self.hore_pokracuje = False
+                    break
+                if mapa[self.policko_x][y_hore] == 1:
+                    mapa[self.policko_x][y_hore] = 3
+                    self.vybuchujici_policko.append([self.policko_x, y_hore])
 
-            #expanze výbuchu nahorů
-            if self.hore_pokracuje:
-                for dy in range(-1, -self.dosah - 1, -1):
-                    y_hore = self.policko_y + dy
-                    if y_hore < 0 or mapa[self.policko_x][y_hore] == 0:
-                        break
-                    if mapa[self.policko_x][y_hore] == 2:
-                        mapa[self.policko_x][y_hore] = 1
-                        self.odbouchnuto.append((self.policko_x * 128 + 384, y_hore * 128 + (-6)))
-                        break
-                    self.odbouchnuto.append((self.policko_x * 128 + 384, y_hore * 128 + (-6)))
+        print(pygame.time.get_ticks() - self.zacatek_vybuchu)
+        if (pygame.time.get_ticks() - self.zacatek_vybuchu) == 1000:
+            for x, y in self.vybuchujici_policko:
+                print(x , y)
+                mapa[x][y] = 1
+            self.bum = False
 
     def draw(self):
         if self.obr == bomba1_obr or self.obr == bomba2_obr:
