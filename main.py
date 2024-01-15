@@ -18,6 +18,8 @@ novy_y = (vyska - len(mapa.mapa) * velikost_pole) // 2
 
 h1 = Player(mapa.mapa, screen)
 
+clock = pygame.time.Clock()
+
 fajci = True
 while fajci:
     for event in pygame.event.get():
@@ -53,6 +55,8 @@ while fajci:
     h1.pohyb()
     h1.x, h1.y = h1.souradnice_policka(velikost_pole, novy_x, novy_y)
     screen.blit(h1.obr, (h1.x, h1.y))
+
+    clock.tick(60)
 
     pygame.display.flip()
 

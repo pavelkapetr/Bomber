@@ -17,7 +17,7 @@ class Player:
         self.policko_x = 1
         self.policko_y = 1
         self.posledne = pygame.time.get_ticks()
-        self.cooldown = 100
+        self.cooldown = 200
         self.pocet_bomb = 1
         self.bomby = []
         self.dosah = 2
@@ -33,6 +33,7 @@ class Player:
 
     def pohyb(self):
         nyni = pygame.time.get_ticks()
+        print(nyni)
 
         if nyni - self.posledne >= self.cooldown:
             klavesa = pygame.key.get_pressed()
@@ -91,6 +92,7 @@ class Bomba(Player):
             self.obr = exploze
             self.bum = True
         if nyni - self.pocatek >= 3 * self.zpozdeni:
+            del self
 
 
     #asdef ende(selfself, mapa):
