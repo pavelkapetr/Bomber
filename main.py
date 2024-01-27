@@ -1,6 +1,6 @@
 import pygame
-from hrac import Player
 import mapa
+from hrac import Hrac
 
 pygame.init()
 
@@ -16,7 +16,8 @@ velikost_pole = 128
 novy_x = (sirka - len(mapa.mapa[0]) * velikost_pole) // 2
 novy_y = (vyska - len(mapa.mapa) * velikost_pole) // 2
 
-h1 = Player(mapa.mapa, screen)
+h1 = Hrac(mapa.mapa, screen, 1, 1)
+bomb = []
 
 clock = pygame.time.Clock()
 
@@ -26,7 +27,7 @@ while fajci:
         if event.type == pygame.QUIT:
             fajci = False
 
-    #vyčištění plochy
+    # vyčištění plochy
     screen.fill((0, 0, 0))
 
     # projde mapu a vyakreslí jednotlivé prvky jako reprezentované obrázky
@@ -43,14 +44,18 @@ while fajci:
             if mapa.mapa[rada][sloupec] == 3:
                 screen.blit(mapa.trava_vybuch_obr, (x, y))
 
-    # projde všechny bomby a upraví jejich stav
-    for bomby in h1.bomby:
-        if bomby.bum:
-            bomby.vybuch(mapa.mapa)
-        #else:
-            #bomby.ende(mapa.mapa)
-        bomby.fajci()
-        bomby.draw()
+    # poslouchání mezerníkú -> položení bomby
+    k = pygame.key.get_pressed()
+    if k[pygame.K_SPACE] and h1.pocet_bomb > 0:
+        x = h1.vytvor_bombu()
+        bomb.append(x)
+
+    # projde všechny bomby a zavolá potřebné metody pro chod
+    for b in bomb:
+        if b.bum:
+            b.vybuch()
+        b.fajci()
+        b.draw(velikost_pole, novy_x, novy_y)
 
     h1.pohyb()
     h1.x, h1.y = h1.souradnice_policka(velikost_pole, novy_x, novy_y)
