@@ -98,5 +98,4 @@ class Bomba1:
                     break
 
     def draw(self, velikost_pole, novy_x, novy_y):
-        print(self.pole_x)
         self.screen.blit(self.obr, (self.pole_x * velikost_pole + novy_x, self.pole_y * velikost_pole + novy_y))
