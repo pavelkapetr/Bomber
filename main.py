@@ -47,15 +47,20 @@ while fajci:
     # poslouchání mezerníkú -> položení bomby
     k = pygame.key.get_pressed()
     if k[pygame.K_SPACE] and h1.pocet_bomb > 0:
+        h1.pocet_bomb -= 1
         x = h1.vytvor_bombu()
         bomb.append(x)
 
     # projde všechny bomby a zavolá potřebné metody pro chod
     for b in bomb:
-        if b.bum:
-            b.vybuch()
         b.fajci()
         b.draw(velikost_pole, novy_x, novy_y)
+        if b.smrt:
+            bomb.remove(b)
+            h1.pocet_bomb += 1
+            print("BUM!")
+        # if b.bum:
+            # b.vybuch()
 
     h1.pohyb()
     h1.x, h1.y = h1.souradnice_policka(velikost_pole, novy_x, novy_y)

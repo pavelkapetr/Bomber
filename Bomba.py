@@ -22,6 +22,7 @@ class Bomba1:
         self.u_pok = True
         self.d_pok = True
         self.vykresluje = True
+        self.smrt = False
         self.bum_pole = []
 
     def fajci(self):
@@ -29,7 +30,12 @@ class Bomba1:
         if self.zpozdeni <= nyni - self.start < 2 * self.zpozdeni:
             self.obr = bomba_obr2
         elif 2 * self.zpozdeni <= nyni - self.start < 3 * self.zpozdeni:
-            self.bum = True
+            self.vybuch()
+            self.vykresluje = False
+        elif 3 * self.zpozdeni <= nyni - self.start < 4 * self.zpozdeni:
+            self.smrt = True
+            for x, y in self.bum_pole:
+                self.mapa[x][y] = 1
 
     def vybuch(self):
 
@@ -40,7 +46,7 @@ class Bomba1:
                 if x_prav >= len(self.mapa) or self.mapa[x_prav][self.pole_y] == 0:
                     self.p_pok = False
                     break
-                elif self.mapa[x_prav][self.pole_x] == 1:
+                elif self.mapa[x_prav][self.pole_y] == 1:
                     self.mapa[x_prav][self.pole_y] = 3
                     self.bum_pole.append([x_prav, self.pole_y])
                 elif self.mapa[x_prav][self.pole_y] == 2:
@@ -51,7 +57,7 @@ class Bomba1:
 
         # expanze výbucu doleva
         if self.l_pok:
-            for i in range(-1, self.dosah - 1, -1):
+            for i in range(-1, -self.dosah - 1, -1):
                 x_lev = self.pole_x + i
                 if x_lev < 0 or self.mapa[x_lev][self.pole_y] == 0:
                     self.l_pok = False
@@ -83,7 +89,7 @@ class Bomba1:
 
         # expanze výbuchu nahoru
         if self.u_pok:
-            for y in range(-1, self.dosah - 1, -1):
+            for y in range(-1, -self.dosah - 1, -1):
                 y_up = self.pole_y + y
                 if y_up < 0 or self.mapa[self.pole_x][y_up] == 0:
                     self.u_pok = False
@@ -94,8 +100,9 @@ class Bomba1:
                 elif self.mapa[self.pole_x][y_up] == 2:
                     self.mapa[self.pole_x][y_up] = 3
                     self.bum_pole.append([self.pole_x, y_up])
-                    self.u_pok= False
+                    self.u_pok = False
                     break
-
+        print(self.bum_pole)
     def draw(self, velikost_pole, novy_x, novy_y):
-        self.screen.blit(self.obr, (self.pole_x * velikost_pole + novy_x, self.pole_y * velikost_pole + novy_y))
+        if self.vykresluje:
+            self.screen.blit(self.obr, (self.pole_x * velikost_pole + novy_x, self.pole_y * velikost_pole + novy_y))

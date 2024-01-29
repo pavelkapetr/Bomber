@@ -16,7 +16,7 @@ class Hrac:
         self.posledne = pygame.time.get_ticks()
         self.pocet_bomb = 1
         self.cooldown = 200
-        self.dosah = 1
+        self.dosah = 2
         self.mapa = mapa
         self.screen = screen
 
@@ -26,28 +26,27 @@ class Hrac:
         return x, y
 
     def pohyb(self):
-        nyni = pygame.time.get_ticks()
+        # nyni = pygame.time.get_ticks()
 
-        if nyni - self.posledne >= self.cooldown:
-            klavesa = pygame.key.get_pressed()
+        klavesa = pygame.key.get_pressed()
 
-            if klavesa[pygame.K_w] and self.policko_y > 1:
-                if mapa.mapa[self.policko_x][self.policko_y - 1] != 0 and mapa.mapa[self.policko_x][self.policko_y - 1] != 2:
-                    self.policko_y -= 1
-            elif klavesa[pygame.K_s] and self.policko_y < 7:
-                if mapa.mapa[self.policko_x][self.policko_y + 1] != 0 and mapa.mapa[self.policko_x][self.policko_y + 1] != 2:
-                    self.policko_y += 1
-            elif klavesa[pygame.K_a] and self.policko_x > 1:
-                if mapa.mapa[self.policko_x - 1][self.policko_y] != 0 and mapa.mapa[self.policko_x - 1][self.policko_y] != 2:
-                    self.policko_x -= 1
-            elif klavesa[pygame.K_d] and self.policko_x < 7:
-                if mapa.mapa[self.policko_x + 1][self.policko_y] != 0 and mapa.mapa[self.policko_x + 1][self.policko_y] != 2:
-                    self.policko_x += 1
-            elif klavesa[pygame.K_SPACE] and self.pocet_bomb > 0:
-                self.vytvor_bombu()
-                self.pocet_bomb -= 1
+        if klavesa[pygame.K_w] and self.policko_y > 1:
+            if mapa.mapa[self.policko_x][self.policko_y - 1] != 0 and mapa.mapa[self.policko_x][self.policko_y - 1] != 2:
+                self.policko_y -= 1
+        elif klavesa[pygame.K_s] and self.policko_y < 7:
+            if mapa.mapa[self.policko_x][self.policko_y + 1] != 0 and mapa.mapa[self.policko_x][self.policko_y + 1] != 2:
+                self.policko_y += 1
+        elif klavesa[pygame.K_a] and self.policko_x > 1:
+            if mapa.mapa[self.policko_x - 1][self.policko_y] != 0 and mapa.mapa[self.policko_x - 1][self.policko_y] != 2:
+                self.policko_x -= 1
+        elif klavesa[pygame.K_d] and self.policko_x < 7:
+            if mapa.mapa[self.policko_x + 1][self.policko_y] != 0 and mapa.mapa[self.policko_x + 1][self.policko_y] != 2:
+                self.policko_x += 1
+        elif klavesa[pygame.K_SPACE] and self.pocet_bomb > 0:
+            self.vytvor_bombu()
+            self.pocet_bomb -= 1
 
-            self.posledne = nyni
+        # self.posledne = nyni
 
     def vytvor_bombu(self):
         cas = pygame.time.get_ticks()
