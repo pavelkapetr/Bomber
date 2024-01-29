@@ -4,23 +4,27 @@ from hrac import Hrac
 
 pygame.init()
 
+# nastavení okna
 pygame.display.set_icon(pygame.image.load("images/bomb.png"))
-exploze = pygame.image.load("images/explosion.png")
 pygame.display.set_caption("Bomber")
 
+# nastavení velikosti okna
 sirka = 1920
 vyska = 1140
 screen = pygame.display.set_mode((sirka, vyska))
 
+# nastavení veliskosti jednoho políčka a výpočet nových x a y aby hra byla na středu okna
 velikost_pole = 128
 novy_x = (sirka - len(mapa.mapa[0]) * velikost_pole) // 2
 novy_y = (vyska - len(mapa.mapa) * velikost_pole) // 2
 
+# předdefinování hráče a pole bomb
 h1 = Hrac(mapa.mapa, screen, 1, 1)
 bomb = []
 
 clock = pygame.time.Clock()
 
+# hlavní loop hry
 fajci = True
 while fajci:
     for event in pygame.event.get():
@@ -59,12 +63,13 @@ while fajci:
             bomb.remove(b)
             h1.pocet_bomb += 1
             print("BUM!")
-        # if b.bum:
-            # b.vybuch()
 
+    # volání metod ke správné funkci postavy
     h1.pohyb()
     h1.x, h1.y = h1.souradnice_policka(velikost_pole, novy_x, novy_y)
-    screen.blit(h1.obr, (h1.x, h1.y))
+    if h1.zije:
+        screen.blit(h1.obr, (h1.x, h1.y))
+    h1.smrt()
 
     clock.tick(60)
 

@@ -19,6 +19,7 @@ class Hrac:
         self.dosah = 2
         self.mapa = mapa
         self.screen = screen
+        self.zije = True
 
     def souradnice_policka(self, velikost_policka, novy_x, novy_y):
         x = self.policko_x * velikost_policka + novy_x
@@ -52,3 +53,7 @@ class Hrac:
         cas = pygame.time.get_ticks()
         bomba = Bomba1(self.policko_x, self.policko_y, self.dosah, cas, self.mapa, self.screen)
         return bomba
+
+    def smrt (self):
+        if self.mapa[self.policko_x][self.policko_y] == 3:
+            self.zije = False
