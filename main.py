@@ -62,7 +62,7 @@ while fajci:
         if b.smrt:
             bomb.remove(b)
             h1.pocet_bomb += 1
-            print("BUM!")
+            print("BUM!")   
 
     # volání metod ke správné funkci postavy
     h1.pohyb()
