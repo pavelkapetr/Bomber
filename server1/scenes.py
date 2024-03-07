@@ -1,9 +1,8 @@
 import pygame
-from pygame.locals import *
+from Button import Button
 
 pygame.init()
 
-screen = pygame.display.set_mode((1120, 720))
 pygame.display.set_caption("Bomber - menu")
 
 
@@ -24,14 +23,17 @@ class Scene:
 class Menu(Scene):
     def __init__(self):
         super().__init__()
+        self.play_button = Button(500, 300, 300, 100, "Play!")
 
     def event_handler(self, events):
         for event in events:
             if event.type == pygame.QUIT:
                 pygame.quit()
+            self.play_button.eventHandler(event)
 
     def render(self, screen):
         screen.fill((0, 0, 0))
+        self.play_button.render(screen)
 
 
 class Game(Scene):
