@@ -3,7 +3,7 @@ import mapa
 from Bomba import Bomba1
 
 pygame.init()
-hrac_obr = pygame.image.load("images/ninja.png")
+hrac_obr = pygame.image.load("server1/images/ninja.png")
 
 
 class Hrac:

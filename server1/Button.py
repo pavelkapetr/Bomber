@@ -1,9 +1,10 @@
 import pygame
 
 pygame.init()
+pygame.font.init()
 
 
-class Button():
+class Button:
     def __init__(self, x, y, width, height, text):
         self.x = x
         self.y = y
@@ -42,3 +43,15 @@ class Button():
         text = font.render(self.text, True, (0, 0, 0))
         text_rect = text.get_rect(center=self.rect.center)
         screen.blit(text, text_rect)
+
+
+class Text:
+    def __init__(self, x, y, text):
+        self.x = x
+        self.y = y
+        self.text = text
+
+    def render(self, screen):
+        font = pygame.font.Font('freesansbold.ttf', 72)
+        render = font.render(self.text, True, (255, 255, 255))
+        screen.blit(render, (self.x, self.y))

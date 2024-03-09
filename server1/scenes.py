@@ -1,5 +1,5 @@
 import pygame
-from Button import Button
+from Button import Button, Text
 
 pygame.init()
 
@@ -23,7 +23,8 @@ class Scene:
 class Menu(Scene):
     def __init__(self):
         super().__init__()
-        self.play_button = Button(500, 300, 300, 100, "Play!")
+        self.play_button = Button(500, 350, 300, 100, "Play!")
+        self.heading = Text(500, 200, "Bomber")
 
     def event_handler(self, events):
         for event in events:
@@ -34,6 +35,7 @@ class Menu(Scene):
     def render(self, screen):
         screen.fill((0, 0, 0))
         self.play_button.render(screen)
+        self.heading.render(screen)
 
 
 class Game(Scene):

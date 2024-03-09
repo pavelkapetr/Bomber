@@ -6,7 +6,7 @@ from server1.scenes import Menu, Game
 pygame.init()
 
 # nastavení ikony a nadpisu okna
-pygame.display.set_icon(pygame.image.load(r"C:/Bomber/images/bomb.png"))
+pygame.display.set_icon(pygame.image.load(r"images/bomb.png"))
 pygame.display.set_caption("Bomber")
 
 # nastavení velikosti okna

@@ -5,7 +5,7 @@ from hrac import Hrac
 pygame.init()
 
 # nastavení okna
-pygame.display.set_icon(pygame.image.load("images/bomb.png"))
+pygame.display.set_icon(pygame.image.load("server1/images/bomb.png"))
 pygame.display.set_caption("Bomber")
 
 # nastavení velikosti okna

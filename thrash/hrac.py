@@ -3,10 +3,10 @@ import mapa
 
 pygame.init()
 
-hrac_obr = pygame.image.load("../images/ninja.png")
-bomba1_obr = pygame.image.load("../images/bomb.png")
-bomba2_obr = pygame.image.load("../images/bomb_red.png")
-exploze = pygame.image.load("../images/explosion.png")
+hrac_obr = pygame.image.load("../server1/images/ninja.png")
+bomba1_obr = pygame.image.load("../server1/images/bomb.png")
+bomba2_obr = pygame.image.load("../server1/images/bomb_red.png")
+exploze = pygame.image.load("../server1/images/explosion.png")
 
 
 class Player:

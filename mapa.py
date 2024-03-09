@@ -10,10 +10,10 @@ pygame.init()
 """
 
 # načtení potřebných png souborů do proměnných
-box_obr = pygame.image.load("images/wooden-box.png")
-trava_obr = pygame.image.load("images/grass_texture.png")
-zed_obr = pygame.image.load("images/wall.png")
-trava_vybuch_obr = pygame.image.load("images/grass_explosion_texture.png")
+box_obr = pygame.image.load("server1/images/wooden-box.png")
+trava_obr = pygame.image.load("server1/images/grass_texture.png")
+zed_obr = pygame.image.load("server1/images/wall.png")
+trava_vybuch_obr = pygame.image.load("server1/images/grass_explosion_texture.png")
 
 # předdefinovaná mapa
 mapa = [
