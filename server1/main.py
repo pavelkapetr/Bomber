@@ -1,6 +1,7 @@
 import pygame
 from scenes import Menu, Game
 from client import receive, send
+from prepinac_scen import get_scene
 
 pygame.init()
 
@@ -16,7 +17,14 @@ screen = pygame.display.set_mode((sirka, vyska))
 currentScene = Menu()
 running = True
 while running:
+
+    if get_scene() == "Game" and not isinstance(get_scene(), Game):
+        currentScene = Game()
+    elif get_scene() == "Menu" and not isinstance(get_scene(), Menu):
+        currentScene = Menu()
+
     events = pygame.event.get()
+
     currentScene.event_handler(events)
 
     currentScene.update()

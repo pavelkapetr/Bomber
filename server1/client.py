@@ -14,5 +14,4 @@ def send(msg):
 def receive():
     serverInfo = client_socket.recvfrom(bufferSize)
     msgOdServer = f"{serverInfo[0].decode('utf-8')}"
-    print(msgOdServer)
     return msgOdServer

@@ -1,12 +1,14 @@
 import pygame
 from client import send
+from prepinac_scen import set_scene, get_scene
 
 pygame.init()
 pygame.font.init()
 
 
 class Button:
-    def __init__(self, x, y, width, height, text):
+    def __init__(self, id, x, y, width, height, text):
+        self.id = id
         self.x = x
         self.y = y
         self.width = width
@@ -35,7 +37,11 @@ class Button:
 
     def click(self):
         self.statement = 'pressed'
-        send("klik")
+        send(f"klik {self.id}")
+        if get_scene() == "Menu":
+            set_scene("Game")
+        elif get_scene() == "Game":
+            set_scene("Menu")
 
     def render(self, screen):
         font = pygame.font.Font('freesansbold.ttf', 36)
