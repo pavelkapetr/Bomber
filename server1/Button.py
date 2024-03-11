@@ -1,4 +1,5 @@
 import pygame
+from client import send
 
 pygame.init()
 pygame.font.init()
@@ -34,6 +35,7 @@ class Button:
 
     def click(self):
         self.statement = 'pressed'
+        send("klik")
 
     def render(self, screen):
         font = pygame.font.Font('freesansbold.ttf', 36)

@@ -14,6 +14,7 @@ while True:
     # bytesAddressPair je pole obsahující [msg, IPadres]
     bytesAddressPair = UDPServerSocket.recvfrom(bufferSize)
     msg = bytesAddressPair[1], bytesAddressPair[0].decode('utf-8')
+    print(msg[1])
 
     # Sending a reply to client
     UDPServerSocket.sendto(msgToSend, bytesAddressPair[1])
