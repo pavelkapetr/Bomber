@@ -4,18 +4,25 @@ localIP = "127.0.0.1"
 localPort = 20001
 bufferSize = 1024
 
-msgToSend = "Vitej na serveru ty kapino".encode('utf-8')
+msgToSend = "Waiting for players to join.."
 
 UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 UDPServerSocket.bind((localIP, localPort))
-print("UDP server fajci a posloucha")
+print(msgToSend)
+players = []
 
-while True:
+while len(players) < 2:
     # bytesAddressPair je pole obsahující [msg, IPadres]
     bytesAddressPair = UDPServerSocket.recvfrom(bufferSize)
-    msg = bytesAddressPair[1], bytesAddressPair[0].decode('utf-8')
-    if msg[1] == "klik 1":
-        UDPServerSocket.sendto("Game".encode('utf-8'), msg[0])
+    clientAdress = bytesAddressPair[1]
+    msg = bytesAddressPair[0].decode('utf-8')
+    if clientAdress not in players:
+        players.append(clientAdress)
+        print("Player joined: ", clientAdress)
+        UDPServerSocket.sendto(msgToSend.encode('utf-8'), clientAdress)
 
-    # Sending a reply to client
-    UDPServerSocket.sendto(msgToSend, bytesAddressPair[1])
+print("All players has joined. Starting the game!")
+for player in players:
+    UDPServerSocket.sendto("Game is starting".encode('utf-8'), player)
+
+UDPServerSocket.close()

@@ -38,7 +38,7 @@ class Menu(Scene):
         self.heading.render(screen)
 
 
-class Game(Scene):
+class Matchmaking(Scene):
 
     def __init__(self):
         super().__init__()
@@ -53,3 +53,16 @@ class Game(Scene):
     def render(self, screen):
         screen.fill((0, 0, 0))
         self.xButton.render(screen)
+
+
+class Game(Scene):
+    def __init__(self):
+        super().__init__()
+
+    def event_handler(self, events):
+        for event in events:
+            if event.type == pygame.QUIT:
+                pygame.quit()
+
+    def render(self, screen):
+        screen.fill((0, 0, 0))
