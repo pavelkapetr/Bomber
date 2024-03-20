@@ -1,12 +1,18 @@
+import sys
+
 import pygame
 import mapa
 from hrac import Hrac
+from websockets.sync.client import connect
+from client import msg
 
 pygame.init()
 
 # nastavení okna
 pygame.display.set_icon(pygame.image.load("server1/images/bomb.png"))
 pygame.display.set_caption("Bomber")
+font = pygame.font.Font('freesansbold.ttf', 72)
+text_queue = font.render("Waiting for players...", True, (255, 255, 255))
 
 # nastavení velikosti okna
 sirka = 1920
@@ -24,12 +30,50 @@ bomb = []
 
 clock = pygame.time.Clock()
 
+socket = connect("ws://localhost:8000")
+
+while True:
+    print("tvoja matka")
+    screen.fill((0, 0, 0))
+    clock.tick(60)
+
+    socket.send("UŽ?")
+    message = socket.recv()
+    if message == "ZACINAME":
+        break
+
+    # text
+    screen.blit(text_queue, (500, 500))
+
+    pygame.display.flip()
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
 # hlavní loop hry
 fajci = True
 while fajci:
+
+    # komunikace se serverem
+    bomba_x, bomba_y = -1, -1
+    if len(bomb) != 0:
+        bomba_x, bomba_y = bomb[0].pole_x, bomb[0].pole_y
+    data = {"hrac": (h1.x, h1.y), "bomba": (bomba_x, bomba_y)}
+    # mapa, ostatni_hraci, ostatni_bomby = msg(socket, data)
+    msg(socket, data)
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             fajci = False
+
+    # poslouchání mezerníkú -> položení bomby
+    k = pygame.key.get_pressed()
+    if k[pygame.K_SPACE] and h1.pocet_bomb > 0:
+        h1.pocet_bomb -= 1
+        x = h1.vytvor_bombu()
+        bomb.append(x)
 
     # vyčištění plochy
     screen.fill((0, 0, 0))
@@ -48,13 +92,6 @@ while fajci:
             if mapa.mapa[rada][sloupec] == 3:
                 screen.blit(mapa.trava_vybuch_obr, (x, y))
 
-    # poslouchání mezerníkú -> položení bomby
-    k = pygame.key.get_pressed()
-    if k[pygame.K_SPACE] and h1.pocet_bomb > 0:
-        h1.pocet_bomb -= 1
-        x = h1.vytvor_bombu()
-        bomb.append(x)
-
     # projde všechny bomby a zavolá potřebné metody pro chod
     for b in bomb:
         b.fajci()
@@ -62,7 +99,7 @@ while fajci:
         if b.smrt:
             bomb.remove(b)
             h1.pocet_bomb += 1
-            print("BUM!")   
+            print("BUM!")
 
     # volání metod ke správné funkci postavy
     h1.pohyb()

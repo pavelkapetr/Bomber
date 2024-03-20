@@ -14,7 +14,7 @@ class Hrac:
         self.policko_x = spawn_x
         self.policko_y = spawn_y
         self.posledne = pygame.time.get_ticks()
-        self.pocet_bomb = 1
+        self.pocet_bomb = 2
         self.cooldown = 200
         self.dosah = 2
         self.mapa = mapa
