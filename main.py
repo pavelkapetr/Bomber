@@ -1,15 +1,22 @@
+import json
 import sys
 
 import pygame
-import mapa
 from hrac import Hrac
 from websockets.sync.client import connect
 from client import msg
 
 pygame.init()
 
+# načtení potřebných obrázků
+HRAC_OBR = pygame.image.load("images/ninja.png")
+box_obr = pygame.image.load("images/wooden-box.png")
+trava_obr = pygame.image.load("images/grass_texture.png")
+zed_obr = pygame.image.load("images/wall.png")
+trava_vybuch_obr = pygame.image.load("images/grass_explosion_texture.png")
+
 # nastavení okna
-pygame.display.set_icon(pygame.image.load("server1/images/bomb.png"))
+pygame.display.set_icon(pygame.image.load("images/bomb.png"))
 pygame.display.set_caption("Bomber")
 font = pygame.font.Font('freesansbold.ttf', 72)
 text_queue = font.render("Waiting for players...", True, (255, 255, 255))
@@ -21,25 +28,24 @@ screen = pygame.display.set_mode((sirka, vyska))
 
 # nastavení veliskosti jednoho políčka a výpočet nových x a y aby hra byla na středu okna
 velikost_pole = 128
-novy_x = (sirka - len(mapa.mapa[0]) * velikost_pole) // 2
-novy_y = (vyska - len(mapa.mapa) * velikost_pole) // 2
+
 
 # předdefinování hráče a pole bomb
-h1 = Hrac(mapa.mapa, screen, 1, 1)
+
 bomb = []
 
 clock = pygame.time.Clock()
 
-socket = connect("ws://localhost:8000")
+socket = connect("ws://localhost:8001")
 
 while True:
-    print("tvoja matka")
     screen.fill((0, 0, 0))
-    clock.tick(60)
+    clock.tick(59)
 
     socket.send("UŽ?")
     message = socket.recv()
-    if message == "ZACINAME":
+    print(message)
+    if message != "CEKAME":
         break
 
     # text
@@ -52,7 +58,55 @@ while True:
             pygame.quit()
             sys.exit()
 
+jede = True
+while jede:
+    clock.tick(60)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            jede = False
+            pygame.quit()
+            sys.exit()
+
+    socket.send("info?")
+    data_json = socket.recv()
+    data = json.loads(data_json)
+    mapa = data["mapa"]
+    print(mapa)
+
+    screen.fill((0, 0, 0))
+    # vykreslení mapy
+    novy_x = (sirka - len(mapa) * velikost_pole) // 2
+    novy_y = (vyska - len(mapa[0]) * velikost_pole) // 2
+    for rada in range(len(mapa)):
+        for sloupec in range(len(mapa[0])):
+            x = rada * velikost_pole + novy_x
+            y = sloupec * velikost_pole + novy_y
+            if mapa[rada][sloupec] == 0:
+                screen.blit(zed_obr, (x, y))
+            if mapa[rada][sloupec] == 1:
+                screen.blit(trava_obr, (x, y))
+            if mapa[rada][sloupec] == 2:
+                screen.blit(box_obr, (x, y))
+            if mapa[rada][sloupec] == 3:
+                screen.blit(trava_vybuch_obr, (x, y))
+
+    pozice_hracu = data["pozice_hracu"]
+    index = data["index_hrace"]
+
+    screen.blit(HRAC_OBR, pozice_hracu[index])
+
+    pygame.display.flip()
+
+pygame.quit()
+
+
+
+
+
+
 # hlavní loop hry
+h1 = Hrac(mapa, screen, 1, 1)
 fajci = True
 while fajci:
 
