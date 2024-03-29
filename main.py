@@ -28,15 +28,22 @@ screen = pygame.display.set_mode((sirka, vyska))
 
 # nastavení veliskosti jednoho políčka a výpočet nových x a y aby hra byla na středu okna
 velikost_pole = 128
-
+mapa = None
 
 # předdefinování hráče a pole bomb
-
+P1 = Hrac(mapa, screen, -50, -50)
 bomb = []
 
 clock = pygame.time.Clock()
 
 socket = connect("ws://localhost:8001")
+
+def poslat(x, y):
+    socket.send(json.dumps(
+        {
+            "pozice" : (x, y)
+        }
+    ))
 
 while True:
     screen.fill((0, 0, 0))
@@ -93,8 +100,31 @@ while jede:
 
     pozice_hracu = data["pozice_hracu"]
     index = data["index_hrace"]
+    P_X, P_Y = pozice_hracu[index]
 
-    screen.blit(HRAC_OBR, pozice_hracu[index])
+    key = pygame.key.get_just_pressed()
+    if key[pygame.K_w] and P_Y > 1:
+        if mapa[P_Y-1][P_X] != 0 and mapa[P_Y-1][P_X] != 2:
+            P_Y -= 1
+    elif key[pygame.K_s] and P_Y < 7:
+        if mapa[P_Y+1][P_X] != 0 and mapa[P_Y+1][P_X] != 2:
+            P_Y += 1
+    elif key[pygame.K_a] and P_X > 1:
+        if mapa[P_Y][P_X-1] != 0 and mapa[P_Y][P_X-1] != 2:
+            P_X -= 1
+    elif key[pygame.K_d] and P_X < 7:
+        if mapa[P_Y][P_X+1] !=0 and mapa[P_Y][P_X+1] != 2:
+            P_X += 1
+    pozice_hracu[index] = (P_X, P_Y)
+    for hrac in pozice_hracu:
+        souradnice_x = hrac[0] * velikost_pole + novy_x
+        souradnice_y = hrac[1] * velikost_pole + novy_y
+        if hrac == (P_X, P_Y):
+            screen.blit(HRAC_OBR, (souradnice_x, souradnice_y))
+        else:
+            screen.blit(HRAC_OBR, (souradnice_x, souradnice_y))
+
+    poslat(P_X, P_Y)
 
     pygame.display.flip()
 
@@ -167,3 +197,5 @@ while fajci:
     pygame.display.flip()
 
 pygame.quit()
+
+

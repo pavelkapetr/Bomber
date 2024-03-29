@@ -31,19 +31,26 @@ async def handler(websocket):
 
     while True: # dokud běží, komunikace s clientem je aktivni
         try:
-            message = await websocket.recv() # pockám na request ale nezajímá mě co poslal
+            message = await websocket.recv()
         except Exception as e:
             print("Ztratili jsme ho: ", e)
             queue.remove(websocket)
             break
-        if websocket in hra["hraci"]:
-            await poslat(websocket)
-        else:
+        if websocket not in hra["hraci"]:
             await websocket.send("CEKAME")
+            continue
+        elif message == "UŽ?":
+            await websocket.send("start")
+            continue
         print(message, websocket)
         if message == "info?":
             await poslat(websocket)
             print("posláno", websocket)
+        else:
+
+            data = json.loads(message)
+            index = hra["hraci"].index(websocket)
+            hra["pozice_hracu"][index] = data["pozice"]
 
 async def main():
     async with websockets.serve(handler, "", 8001):
