@@ -3,50 +3,64 @@ import sys
 
 import pygame
 from hrac import Hrac
+from Bomba import Bomba1
 from websockets.sync.client import connect
 from client import msg
 
 pygame.init()
 
 # načtení potřebných obrázků
-HRAC_OBR = pygame.image.load("images/ninja.png")
-box_obr = pygame.image.load("images/wooden-box.png")
-trava_obr = pygame.image.load("images/grass_texture.png")
-zed_obr = pygame.image.load("images/wall.png")
-trava_vybuch_obr = pygame.image.load("images/grass_explosion_texture.png")
+PLAYER_PIC = pygame.image.load("images/ninja.png")
+ENEMY_PIC = pygame.image.load("images/enemy.png")
+BOX_PIC = pygame.image.load("images/wooden-box.png")
+GRASS_PIC = pygame.image.load("images/grass_texture.png")
+WALL_PIC = pygame.image.load("images/wall.png")
+EXP_GRASS_PIC = pygame.image.load("images/grass_explosion_texture.png")
 
 # nastavení okna
 pygame.display.set_icon(pygame.image.load("images/bomb.png"))
 pygame.display.set_caption("Bomber")
+
+# definování fontu a render textu
 font = pygame.font.Font('freesansbold.ttf', 72)
 text_queue = font.render("Waiting for players...", True, (255, 255, 255))
 
 # nastavení velikosti okna
-sirka = 1920
-vyska = 1140
-screen = pygame.display.set_mode((sirka, vyska))
+WIDTH = 1920
+HEIGHT = 1140
+SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
 
 # nastavení veliskosti jednoho políčka a výpočet nových x a y aby hra byla na středu okna
-velikost_pole = 128
+POLE_SIZE = 128
 mapa = None
 
 # předdefinování hráče a pole bomb
-P1 = Hrac(mapa, screen, -50, -50)
-bomb = []
+P1 = Hrac(mapa, SCREEN, -50, -50)
+bombs = []
+mybomb = None
 
 clock = pygame.time.Clock()
 
 socket = connect("ws://localhost:8001")
 
-def poslat(x, y):
-    socket.send(json.dumps(
-        {
-            "pozice" : (x, y)
-        }
-    ))
+def poslat(x, y, bomba=None):
+    if bomba is None:
+        socket.send(json.dumps(
+            {
+                "pozice" : (x, y),
+                "bomby" : None
+            }
+        ))
+    else:
+        socket.send(json.dumps(
+            {
+                "pozice" : (x, y),
+                "bomby" : (bomba.pole_x, bomba.pole_y, bomba.zacatek_vybuchu)
+            }
+        ))
 
 while True:
-    screen.fill((0, 0, 0))
+    SCREEN.fill((0, 0, 0))
     clock.tick(59)
 
     socket.send("UŽ?")
@@ -56,7 +70,7 @@ while True:
         break
 
     # text
-    screen.blit(text_queue, (500, 500))
+    SCREEN.blit(text_queue, (500, 500))
 
     pygame.display.flip()
 
@@ -81,22 +95,22 @@ while jede:
     mapa = data["mapa"]
     print(mapa)
 
-    screen.fill((0, 0, 0))
+    SCREEN.fill((0, 0, 0))
     # vykreslení mapy
-    novy_x = (sirka - len(mapa) * velikost_pole) // 2
-    novy_y = (vyska - len(mapa[0]) * velikost_pole) // 2
+    novy_x = (WIDTH - len(mapa) * POLE_SIZE) // 2
+    novy_y = (HEIGHT - len(mapa[0]) * POLE_SIZE) // 2
     for rada in range(len(mapa)):
         for sloupec in range(len(mapa[0])):
-            x = rada * velikost_pole + novy_x
-            y = sloupec * velikost_pole + novy_y
+            x = rada * POLE_SIZE + novy_x
+            y = sloupec * POLE_SIZE + novy_y
             if mapa[rada][sloupec] == 0:
-                screen.blit(zed_obr, (x, y))
+                SCREEN.blit(WALL_PIC, (x, y))
             if mapa[rada][sloupec] == 1:
-                screen.blit(trava_obr, (x, y))
+                SCREEN.blit(GRASS_PIC, (x, y))
             if mapa[rada][sloupec] == 2:
-                screen.blit(box_obr, (x, y))
+                SCREEN.blit(BOX_PIC, (x, y))
             if mapa[rada][sloupec] == 3:
-                screen.blit(trava_vybuch_obr, (x, y))
+                SCREEN.blit(EXP_GRASS_PIC, (x, y))
 
     pozice_hracu = data["pozice_hracu"]
     index = data["index_hrace"]
@@ -115,16 +129,29 @@ while jede:
     elif key[pygame.K_d] and P_X < 7:
         if mapa[P_Y][P_X+1] !=0 and mapa[P_Y][P_X+1] != 2:
             P_X += 1
+    elif key[pygame.K_SPACE]:
+        DE_START = pygame.time.get_ticks()
+        bomba = Bomba1(P_X, P_Y, 1, DE_START, mapa, SCREEN)
+        bombs.append(bomba)
+        mybomb = bomba
+
     pozice_hracu[index] = (P_X, P_Y)
     for hrac in pozice_hracu:
-        souradnice_x = hrac[0] * velikost_pole + novy_x
-        souradnice_y = hrac[1] * velikost_pole + novy_y
+        souradnice_x = hrac[0] * POLE_SIZE + novy_x
+        souradnice_y = hrac[1] * POLE_SIZE + novy_y
         if hrac == (P_X, P_Y):
-            screen.blit(HRAC_OBR, (souradnice_x, souradnice_y))
+            SCREEN.blit(PLAYER_PIC, (souradnice_x, souradnice_y))
         else:
-            screen.blit(HRAC_OBR, (souradnice_x, souradnice_y))
+            SCREEN.blit(ENEMY_PIC, (souradnice_x, souradnice_y))
 
-    poslat(P_X, P_Y)
+    for bomb in bombs:
+        bomb.fajci()
+        bomb.draw(POLE_SIZE, novy_x, novy_y)
+
+    if len(bombs) >= 0:
+        poslat(P_X, P_Y, mybomb)
+    else:
+        poslat(P_X, P_Y)
 
     pygame.display.flip()
 
@@ -133,8 +160,7 @@ pygame.quit()
 
 
 
-
-
+'''
 # hlavní loop hry
 h1 = Hrac(mapa, screen, 1, 1)
 fajci = True
@@ -197,5 +223,6 @@ while fajci:
     pygame.display.flip()
 
 pygame.quit()
+'''
 
 

@@ -47,10 +47,11 @@ async def handler(websocket):
             await poslat(websocket)
             print("posláno", websocket)
         else:
-
             data = json.loads(message)
             index = hra["hraci"].index(websocket)
             hra["pozice_hracu"][index] = data["pozice"]
+            if hra["bomby"] != None:
+                hra["bomby"].append(data["bomby"])
 
 async def main():
     async with websockets.serve(handler, "", 8001):
