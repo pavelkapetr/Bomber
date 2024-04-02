@@ -36,28 +36,21 @@ mapa = None
 
 # předdefinování hráče a pole bomb
 P1 = Hrac(mapa, SCREEN, -50, -50)
-bombs = []
-mybomb = None
+Bomb = False
 
 clock = pygame.time.Clock()
 
-socket = connect("ws://localhost:8001")
+socket = connect("ws://localhost:8000")
 
-def poslat(x, y, bomba=None):
-    if bomba is None:
-        socket.send(json.dumps(
-            {
-                "pozice" : (x, y),
-                "bomby" : None
-            }
-        ))
-    else:
-        socket.send(json.dumps(
-            {
-                "pozice" : (x, y),
-                "bomby" : (bomba.pole_x, bomba.pole_y, bomba.zacatek_vybuchu)
-            }
-        ))
+
+def poslat(x, y, bomba):
+    socket.send(json.dumps(
+        {
+            "pozice": (x, y),
+            "bomba": bomba
+        }
+    ))
+
 
 while True:
     SCREEN.fill((0, 0, 0))
@@ -79,6 +72,7 @@ while True:
             pygame.quit()
             sys.exit()
 
+Player_1 = Hrac(mapa, SCREEN, 0, 0)
 jede = True
 while jede:
     clock.tick(60)
@@ -93,7 +87,8 @@ while jede:
     data_json = socket.recv()
     data = json.loads(data_json)
     mapa = data["mapa"]
-    print(mapa)
+    Player_1.mapa = mapa
+    # print(mapa)
 
     SCREEN.fill((0, 0, 0))
     # vykreslení mapy
@@ -114,51 +109,58 @@ while jede:
 
     pozice_hracu = data["pozice_hracu"]
     index = data["index_hrace"]
+    Player_1.policko_x, Player_1.policko_y = pozice_hracu[index]
     P_X, P_Y = pozice_hracu[index]
 
     key = pygame.key.get_just_pressed()
+    if key[pygame.K_SPACE] and Player_1.pocet_bomb > 0:
+        Bomb = True
+
+    Player_1.pohyb(key)
+
+    Player_1.x, Player_1.y = Player_1.souradnice_policka(POLE_SIZE, novy_x, novy_y)
+    if Player_1.zije:
+        SCREEN.blit(Player_1.obr, (Player_1.x, Player_1.y))
+    Player_1.smrt()
+
+    pozice_hracu[index] = (Player_1.policko_x, Player_1.policko_y)
+    for hrac in pozice_hracu:
+        souradnice_x = hrac[0] * POLE_SIZE + novy_x
+        souradnice_y = hrac[1] * POLE_SIZE + novy_y
+        if hrac != (Player_1.policko_x, Player_1.policko_y):
+            SCREEN.blit(ENEMY_PIC, (souradnice_x, souradnice_y))
+
+    poslat(Player_1.policko_x, Player_1.policko_y, Bomb)
+    Bomb = False
+
+    pygame.display.flip()
+
+'''
+    for bomb in bombs:
+        bomb.fajci()
+        bomb.draw(POLE_SIZE, novy_x, novy_y)
+'''
+'''
     if key[pygame.K_w] and P_Y > 1:
-        if mapa[P_Y-1][P_X] != 0 and mapa[P_Y-1][P_X] != 2:
+        if mapa[P_Y - 1][P_X] != 0 and mapa[P_Y - 1][P_X] != 2:
             P_Y -= 1
     elif key[pygame.K_s] and P_Y < 7:
-        if mapa[P_Y+1][P_X] != 0 and mapa[P_Y+1][P_X] != 2:
+        if mapa[P_Y + 1][P_X] != 0 and mapa[P_Y + 1][P_X] != 2:
             P_Y += 1
     elif key[pygame.K_a] and P_X > 1:
-        if mapa[P_Y][P_X-1] != 0 and mapa[P_Y][P_X-1] != 2:
+        if mapa[P_Y][P_X - 1] != 0 and mapa[P_Y][P_X - 1] != 2:
             P_X -= 1
     elif key[pygame.K_d] and P_X < 7:
-        if mapa[P_Y][P_X+1] !=0 and mapa[P_Y][P_X+1] != 2:
+        if mapa[P_Y][P_X + 1] != 0 and mapa[P_Y][P_X + 1] != 2:
             P_X += 1
     elif key[pygame.K_SPACE]:
         DE_START = pygame.time.get_ticks()
         bomba = Bomba1(P_X, P_Y, 1, DE_START, mapa, SCREEN)
         bombs.append(bomba)
         mybomb = bomba
-
-    pozice_hracu[index] = (P_X, P_Y)
-    for hrac in pozice_hracu:
-        souradnice_x = hrac[0] * POLE_SIZE + novy_x
-        souradnice_y = hrac[1] * POLE_SIZE + novy_y
-        if hrac == (P_X, P_Y):
-            SCREEN.blit(PLAYER_PIC, (souradnice_x, souradnice_y))
-        else:
-            SCREEN.blit(ENEMY_PIC, (souradnice_x, souradnice_y))
-
-    for bomb in bombs:
-        bomb.fajci()
-        bomb.draw(POLE_SIZE, novy_x, novy_y)
-
-    if len(bombs) >= 0:
-        poslat(P_X, P_Y, mybomb)
-    else:
-        poslat(P_X, P_Y)
-
-    pygame.display.flip()
+'''
 
 pygame.quit()
-
-
-
 
 '''
 # hlavní loop hry
@@ -224,5 +226,3 @@ while fajci:
 
 pygame.quit()
 '''
-
-

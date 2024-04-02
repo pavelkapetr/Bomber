@@ -1,5 +1,5 @@
 import pygame
-import mapa
+from thrash import mapa
 
 pygame.init()
 
