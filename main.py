@@ -14,6 +14,8 @@ PLAYER_PIC = pygame.image.load("images/ninja.png")
 ENEMY_PIC = pygame.image.load("images/enemy.png")
 BOX_PIC = pygame.image.load("images/wooden-box.png")
 GRASS_PIC = pygame.image.load("images/grass_texture.png")
+GRASS_PICB = pygame.image.load("images/grass_texture_bombB.png")
+GRASS_PICR = pygame.image.load("images/grass_texture_bombR.png")
 WALL_PIC = pygame.image.load("images/wall.png")
 EXP_GRASS_PIC = pygame.image.load("images/grass_explosion_texture.png")
 
@@ -88,7 +90,7 @@ while jede:
     data = json.loads(data_json)
     mapa = data["mapa"]
     Player_1.mapa = mapa
-    # print(mapa)
+    print(mapa)
 
     SCREEN.fill((0, 0, 0))
     # vykreslení mapy
@@ -106,6 +108,10 @@ while jede:
                 SCREEN.blit(BOX_PIC, (x, y))
             if mapa[rada][sloupec] == 3:
                 SCREEN.blit(EXP_GRASS_PIC, (x, y))
+            if mapa[rada][sloupec] == 4:
+                SCREEN.blit(GRASS_PICB, (x, y))
+            if mapa[rada][sloupec] == 5:
+                SCREEN.blit(GRASS_PICR, (x, y))
 
     pozice_hracu = data["pozice_hracu"]
     index = data["index_hrace"]
@@ -121,7 +127,8 @@ while jede:
     Player_1.x, Player_1.y = Player_1.souradnice_policka(POLE_SIZE, novy_x, novy_y)
     if Player_1.zije:
         SCREEN.blit(Player_1.obr, (Player_1.x, Player_1.y))
-    Player_1.smrt()
+
+    #Player_1.smrt()
 
     pozice_hracu[index] = (Player_1.policko_x, Player_1.policko_y)
     for hrac in pozice_hracu:

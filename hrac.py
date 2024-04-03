@@ -56,5 +56,5 @@ class Hrac:
 
     def smrt(self):
         if self.mapa is not None:
-            if self.mapa[self.policko_x][self.policko_y] == 3:
+            if self.mapa[self.policko_y][self.policko_x] == 3:
                 self.zije = False

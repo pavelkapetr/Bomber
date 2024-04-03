@@ -77,19 +77,25 @@ async def poslat(socket):
         for bomb in hra["bomby"]:
             x, y = bomb.pole_x, bomb.pole_y
             i = bomb.fajci(mapa)
-            print(i)
             if i == 4 or i == 5:
-                mapa[y][x] = i
-                print("stalo se")
-            if mapa[y][x] == 4:
-                print(mapa)
-    await socket.send(json.dumps(
-        {
-            "mapa": hra["mapa"],
-            "pozice_hracu": hra["pozice_hracu"],
-            "index_hrace": hra["hraci"].index(socket)
-        }
-    ))
+                mapa[x][y] = i
+            else:
+                hra["mapa"] = mapa
+        await socket.send(json.dumps(
+            {
+                "mapa": mapa,
+                "pozice_hracu": hra["pozice_hracu"],
+                "index_hrace": hra["hraci"].index(socket)
+            }
+        ))
+    else:
+        await socket.send(json.dumps(
+            {
+                "mapa": hra["mapa"],
+                "pozice_hracu": hra["pozice_hracu"],
+                "index_hrace": hra["hraci"].index(socket)
+            }
+        ))
 
 
 if __name__ == "__main__":

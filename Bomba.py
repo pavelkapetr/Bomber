@@ -16,7 +16,7 @@ class Bomba1:
         self.zpozdeni = 1000
         self.zacatek_vybuchu = 0
         self.bum = False
-        self.p_pok = True
+        self.r_pok = True
         self.l_pok = True
         self.u_pok = True
         self.d_pok = True
@@ -30,7 +30,14 @@ class Bomba1:
         elif 2 * self.zpozdeni <= nyni - self.start < 3 * self.zpozdeni:
             return 5
         elif 3 * self.zpozdeni <= nyni - self.start < 4 * self.zpozdeni:
-            mapa = self.vybuch(mapa)
+            self.bum_pole.append([self.pole_x, self.pole_y])
+            self.vybuch(mapa)
+            # print(self.bum_pole)
+            for x, y in self.bum_pole:
+                mapa[x][y] = 3
+            return mapa
+
+        elif 4 * self.zpozdeni <= nyni - self.start < 5 * self.zpozdeni:
             for x, y in self.bum_pole:
                 mapa[x][y] = 1
             return mapa
@@ -38,34 +45,34 @@ class Bomba1:
     def vybuch(self, mapa):
 
         # expanze výbuchu doprava
-        if self.p_pok:
-            for i in range(self.dosah + 1):
+        if self.r_pok:
+            for i in range(1, self.dosah + 1):
                 x_prav = self.pole_x + i
-                if x_prav >= len(mapa) or mapa[self.pole_y][x_prav] == 0:
-                    self.p_pok = False
+                if x_prav >= len(mapa) or mapa[x_prav][self.pole_y] == 0:
+                    self.r_pok = False
                     break
-                elif mapa[self.pole_y][x_prav] == 1:
-                    mapa[self.pole_y][x_prav] = 3
-                    self.bum_pole.append([self.pole_y, x_prav])
-                elif mapa[self.pole_y][x_prav] == 2:
-                    mapa[self.pole_y][x_prav] = 3
-                    self.bum_pole.append([self.pole_y, x_prav])
-                    self.p_pok = False
+                elif mapa[x_prav][self.pole_y] == 1:
+                    print("r", [x_prav, self.pole_y])
+                    self.bum_pole.append([x_prav, self.pole_y])
+                elif mapa[x_prav][self.pole_y] == 2:
+                    print("r", [x_prav, self.pole_y])
+                    self.bum_pole.append([x_prav, self.pole_y])
+                    self.r_pok = False
                     break
 
         # expanze výbucu doleva
         if self.l_pok:
             for i in range(-1, -self.dosah - 1, -1):
                 x_lev = self.pole_x + i
-                if x_lev < 0 or mapa[self.pole_y][x_lev] == 0:
+                if x_lev < 0 or mapa[x_lev][self.pole_y] == 0:
                     self.l_pok = False
                     break
-                elif mapa[self.pole_y][x_lev] == 1:
-                    mapa[self.pole_y][x_lev] = 3
+                elif mapa[x_lev][self.pole_y] == 1:
+                    print("l", [x_lev, self.pole_y])
                     self.bum_pole.append([x_lev, self.pole_y])
-                elif mapa[self.pole_y][x_lev] == 2:
-                    mapa[self.pole_y][x_lev] = 3
-                    self.bum_pole.append([self.pole_y, x_lev])
+                elif mapa[x_lev][self.pole_y] == 2:
+                    print("l", [x_lev, self.pole_y])
+                    self.bum_pole.append([x_lev, self.pole_y])
                     self.l_pok = False
                     break
 
@@ -73,15 +80,15 @@ class Bomba1:
         if self.d_pok:
             for y in range(1, self.dosah + 1):
                 y_dol = self.pole_y + y
-                if y_dol >= len(mapa[0]) or mapa[y_dol][self.pole_x] == 0:
+                if y_dol >= len(mapa[0]) or mapa[self.pole_x][y_dol] == 0:
                     self.d_pok = False
                     break
-                elif mapa[y_dol][self.pole_x] == 1:
-                    mapa[y_dol][self.pole_x] = 3
-                    self.bum_pole.append([y_dol, self.pole_x])
+                elif mapa[self.pole_x][y_dol] == 1:
+                    print("d", [self.pole_x, y_dol])
+                    self.bum_pole.append([self.pole_x, y_dol])
                 elif mapa[y_dol][self.pole_x] == 2:
-                    mapa[y_dol][self.pole_x] = 3
-                    self.bum_pole.append([y_dol, self.pole_x])
+                    print("d", [self.pole_x, y_dol])
+                    self.bum_pole.append([self.pole_x, y_dol])
                     self.d_pok = False
                     break
 
@@ -93,16 +100,13 @@ class Bomba1:
                     self.u_pok = False
                     break
                 elif mapa[y_up][self.pole_x] == 1:
-                    mapa[y_up][self.pole_x] = 3
+                    print("u", [y_up, self.pole_x])
                     self.bum_pole.append([y_up, self.pole_x])
                 elif mapa[y_up][self.pole_x] == 2:
-                    mapa[y_up][self.pole_x] = 3
-                    self.bum_pole.append([self.pole_x, y_up])
-                    self.bum_pole.append([y_up, ])
+                    print("u", [y_up, self.pole_x])
+                    self.bum_pole.append([y_up, self.pole_x])
                     self.u_pok = False
                     break
-        print(self.bum_pole)
-        return mapa
 '''
     def draw(self, velikost_pole, novy_x, novy_y):
         if self.vykresluje:
