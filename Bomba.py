@@ -14,7 +14,6 @@ class Bomba1:
         self.pole_y = spawn_y
         self.dosah = dosah
         self.zpozdeni = 1000
-        self.zacatek_vybuchu = 0
         self.bum = False
         self.r_pok = True
         self.l_pok = True
@@ -24,23 +23,24 @@ class Bomba1:
         self.bum_pole = []
 
     def fajci(self, mapa):
+
         nyni = time.time() * 1000
         if self.zpozdeni <= nyni - self.start < 2 * self.zpozdeni:
-            return 4
-        elif 2 * self.zpozdeni <= nyni - self.start < 3 * self.zpozdeni:
             return 5
-        elif 3 * self.zpozdeni <= nyni - self.start < 4 * self.zpozdeni:
+        elif 2 * self.zpozdeni <= nyni - self.start < 3 * self.zpozdeni:
             self.bum_pole.append([self.pole_x, self.pole_y])
             self.vybuch(mapa)
             # print(self.bum_pole)
             for x, y in self.bum_pole:
                 mapa[x][y] = 3
             return mapa
-
-        elif 4 * self.zpozdeni <= nyni - self.start < 5 * self.zpozdeni:
+        elif 3 * self.zpozdeni <= nyni - self.start < 4 * self.zpozdeni:
             for x, y in self.bum_pole:
                 mapa[x][y] = 1
+            self.smrt = True
             return mapa
+        else:
+            return 4
 
     def vybuch(self, mapa):
 
@@ -99,12 +99,12 @@ class Bomba1:
                 if y_up < 0 or mapa[y_up][self.pole_x] == 0:
                     self.u_pok = False
                     break
-                elif mapa[y_up][self.pole_x] == 1:
-                    print("u", [y_up, self.pole_x])
-                    self.bum_pole.append([y_up, self.pole_x])
-                elif mapa[y_up][self.pole_x] == 2:
-                    print("u", [y_up, self.pole_x])
-                    self.bum_pole.append([y_up, self.pole_x])
+                elif mapa[self.pole_x][y_up] == 1:
+                    print("u", [self.pole_x, y_up])
+                    self.bum_pole.append([self.pole_x, y_up])
+                elif mapa[self.pole_x][y_up] == 2:
+                    print("u", [self.pole_x, y_up])
+                    self.bum_pole.append([self.pole_x, y_up])
                     self.u_pok = False
                     break
 '''

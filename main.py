@@ -2,10 +2,9 @@ import json
 import sys
 
 import pygame
+import time
 from hrac import Hrac
-from Bomba import Bomba1
 from websockets.sync.client import connect
-from client import msg
 
 pygame.init()
 
@@ -121,6 +120,11 @@ while jede:
     key = pygame.key.get_just_pressed()
     if key[pygame.K_SPACE] and Player_1.pocet_bomb > 0:
         Bomb = True
+        Player_1.pocet_bomb -= 1
+
+    cas = time.time()
+    if cas - time.time() >= 4:
+        Player_1.pocet_bomb += 1
 
     Player_1.pohyb(key)
 

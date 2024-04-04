@@ -27,7 +27,6 @@ mapa = [
 hra = {"hraci": [], "mapa": copy.deepcopy(mapa), "bomby": [], "pozice_hracu": [(1, 1), (7, 1), (1, 7), (7, 7)]}
 queue = []
 POCET_HRACU = 2
-START_POS = []
 
 
 async def handler(websocket):
@@ -81,6 +80,8 @@ async def poslat(socket):
                 mapa[x][y] = i
             else:
                 hra["mapa"] = mapa
+            if bomb.smrt:
+                hra["bomby"].remove(bomb)
         await socket.send(json.dumps(
             {
                 "mapa": mapa,
