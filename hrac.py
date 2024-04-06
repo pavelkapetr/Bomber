@@ -28,7 +28,7 @@ class Hrac:
 
         #print(self.policko_y, self.policko_x)
         # klavesa = pygame.key.get_pressed()
-        if self.mapa is not None:
+        if self.mapa is not None and self.zije:
             if klavesa[pygame.K_w] and self.policko_y > 1:
                 if self.mapa[self.policko_x][self.policko_y - 1] != 0 and self.mapa[self.policko_x][self.policko_y - 1] != 2:
                     self.policko_y -= 1
@@ -44,7 +44,11 @@ class Hrac:
             elif klavesa[pygame.K_SPACE] and self.pocet_bomb > 0:
                 self.pocet_bomb -= 1
 
-    # def smrt(self):
-
+    def smrt(self):
+        if self.mapa is not None:
+            if self.mapa[self.policko_x][self.policko_y] == 3:
+                self.zije = False
+                self.policko_x = 0
+                self.policko_y = -2
 
 
