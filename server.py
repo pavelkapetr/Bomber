@@ -24,12 +24,14 @@ mapa = [
 4 = Bomba 1
 5 = Bomba 2
 """
-hra = {"hraci": [], "mapa": copy.deepcopy(mapa), "bomby": [], "pozice_hracu": [(1, 1), (7, 1), (1, 7), (7, 7)]}
-queue = []
 POCET_HRACU = 2
+hra = {"hraci": [], "pripojeni": [i for i in range(POCET_HRACU)], "mapa": copy.deepcopy(mapa), "bomby": [],
+       "pozice_hracu": [(1, 1), (7, 1), (1, 7), (7, 7)]}
+queue = []
 
 
 async def handler(websocket):
+    global hra
     queue.append(websocket)
     print(f"hraci: {len(queue)} / {POCET_HRACU}")
 
@@ -39,22 +41,44 @@ async def handler(websocket):
             hra["hraci"].append(queue[0])  # prvniho přesunu
             queue.pop(0)
 
-    while True:  # dokud běží, komunikace s clientem je aktivni
+    while True: # dokud běží, komunikace s clientem je aktivni
         try:
             message = await websocket.recv()
         except Exception as e:
             print("Ztratili jsme ho: ", e)
-            queue.remove(websocket)
+            try:
+                queue.remove(websocket)
+            except:
+                pass
+            if websocket in hra["hraci"]:
+                try:
+                    hra["pripojeni"].remove(hra["hraci"].index(websocket))
+                    if len(hra["pripojeni"]) == 0:
+                        hra = {"hraci": [], "pripojeni": POCET_HRACU, "mapa": copy.deepcopy(mapa), "bomby": [],
+                               "pozice_hracu": [(1, 1), (7, 1), (1, 7), (7, 7)]}
+                except: pass
             break
-        if websocket not in hra["hraci"]:
-            await websocket.send("CEKAME")
-            continue
-        elif message == "UŽ?":
-            await websocket.send("start")
-            continue
         # print(message, websocket)
         if message == "info?":
-            await poslat(websocket)
+            i = 0
+            for hrac in hra["pozice_hracu"]:
+                if hrac[0] == 0 and hrac[1] == -2:
+                    i += 1
+            if i == POCET_HRACU - 1:
+                await websocket.send("konec")
+                try:
+                    hra["pripojeni"].remove(hra["hraci"].index(websocket))
+                    if len(hra["pripojeni"]) == 0:
+                        hra = {"hraci": [], "pripojeni": POCET_HRACU, "mapa": copy.deepcopy(mapa), "bomby": [],
+                               "pozice_hracu": [(1, 1), (7, 1), (1, 7), (7, 7)]}
+                except: pass
+            else:
+                await poslat(websocket)
+        elif message == "UŽ?":
+            if websocket not in hra["hraci"]:
+                await websocket.send("CEKAME")
+            else:
+                await websocket.send("start")
         else:
             data = json.loads(message)
             index = hra["hraci"].index(websocket)

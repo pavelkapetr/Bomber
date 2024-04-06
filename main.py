@@ -67,12 +67,13 @@ while True:
         break
 
     # text
-    SCREEN.blit(text_queue, (500, 500))
+    SCREEN.blit(text_queue, text_queue.get_rect(center=SCREEN.get_rect().center))
 
     pygame.display.flip()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            socket.close_socket()
             pygame.quit()
             sys.exit()
 
@@ -86,6 +87,7 @@ while jede:
     # poslech akcí okna - po zmáčknutí křížku se vypne
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            socket.close_socket()
             jede = False
             pygame.quit()
             sys.exit()
@@ -93,6 +95,11 @@ while jede:
     # načtení dat ze serveru
     socket.send("info?")
     data_json = socket.recv()
+    print(data_json)
+    if data_json == "konec":
+        socket.close_socket()
+        jede = False
+        break
     data = json.loads(data_json)
     mapa = data["mapa"]
     Player_1.mapa = mapa
@@ -138,10 +145,6 @@ while jede:
 
     Player_1.pohyb(key)
 
-    Player_1.x, Player_1.y = Player_1.souradnice_policka(POLE_SIZE, novy_x, novy_y)
-    if Player_1.zije:
-        SCREEN.blit(Player_1.obr, (Player_1.x, Player_1.y))
-
     Player_1.smrt()
 
     pozice_hracu[index] = (Player_1.policko_x, Player_1.policko_y)
@@ -151,9 +154,30 @@ while jede:
         if hrac != (Player_1.policko_x, Player_1.policko_y):
             SCREEN.blit(ENEMY_PIC, (souradnice_x, souradnice_y))
 
+    Player_1.x, Player_1.y = Player_1.souradnice_policka(POLE_SIZE, novy_x, novy_y)
+    if Player_1.zije:
+        SCREEN.blit(Player_1.obr, (Player_1.x, Player_1.y))
+
     poslat(Player_1.policko_x, Player_1.policko_y, Bomb)
     Bomb = False
 
     pygame.display.flip()
 
-pygame.quit()
+socket.close_socket()
+while True:
+    clock.tick(60)
+    SCREEN.fill((0, 0, 0))
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+    if Player_1.zije:
+        winner = font.render("WINNER!", True, (255, 255, 255))
+        SCREEN.blit(winner, winner.get_rect(center=SCREEN.get_rect().center))
+    else:
+        loser = font.render("LOSS!", True, (255, 255, 255))
+        SCREEN.blit(loser, loser.get_rect(center=SCREEN.get_rect().center))
+
+    pygame.display.flip()
